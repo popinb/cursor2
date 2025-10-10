@@ -33,7 +33,9 @@
 %pip install pandas --quiet
 %pip install plotly --quiet
 %pip install python-docx --quiet
-%pip install langchain-core langchain-openai --quiet
+
+# Try to install langchain packages, but don't fail if they don't work
+%pip install langchain-core langchain-openai --no-deps --quiet
 
 %restart_python
 
@@ -65,12 +67,21 @@ from plotly.subplots import make_subplots
 # Document processing
 from docx import Document
 
-# LLM and MLflow
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-from langchain_core.runnables import RunnableLambda
-from openai import OpenAI
+# LLM and MLflow - using minimal imports to avoid langsmith dependency
 import mlflow
+from openai import OpenAI
+
+# Try to import langchain components, but handle gracefully if they fail
+try:
+    from langchain_openai import ChatOpenAI
+    from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+    from langchain_core.runnables import RunnableLambda
+    LANGCHAIN_AVAILABLE = True
+    print("✅ LangChain components imported successfully")
+except ImportError as e:
+    print(f"⚠️ LangChain import warning: {e}")
+    print("   Will use OpenAI client directly instead")
+    LANGCHAIN_AVAILABLE = False
 
 print("✅ All libraries imported successfully")
 
@@ -506,7 +517,7 @@ class LLMJudgeEvaluator:
     
     def _initialize_model(self):
         """Initialize the LLM judge."""
-        if self.judge_model == "databricks-llm":
+        if self.judge_model == "databricks-llm" and LANGCHAIN_AVAILABLE:
             # Databricks LLM
             self.model = ChatOpenAI(
                 model_name="databricks-llm",
@@ -514,21 +525,8 @@ class LLMJudgeEvaluator:
                 model_kwargs={"response_format": {"type": "json_object"}}
             )
         else:
-            # Zillow API models using OpenAI client
-            def run_chat(messages: list) -> AIMessage:
-                # Extract content from first message
-                content = messages[0].content if messages else ""
-                
-                resp = client.chat.completions.create(
-                    model=self.judge_model,
-                    messages=[{"role": "user", "content": content}],
-                    max_tokens=1000,
-                    temperature=0.0,
-                    response_format={"type": "json_object"}
-                )
-                return AIMessage(content=resp.choices[0].message.content)
-            
-            self.model = RunnableLambda(run_chat)
+            # Use OpenAI client directly for all models
+            self.model = None  # We'll use client directly
     
     def evaluate_single(self, prompt: str, response: str, ground_truth: str, metric: MetricConfig) -> dict:
         """Evaluate a single sample with one metric."""
@@ -541,8 +539,22 @@ class LLMJudgeEvaluator:
         
         try:
             # Get evaluation from LLM
-            result = self.model.invoke([HumanMessage(content=eval_prompt)])
-            result_json = json.loads(result.content)
+            if self.model is not None and LANGCHAIN_AVAILABLE:
+                # Use LangChain model
+                result = self.model.invoke([HumanMessage(content=eval_prompt)])
+                result_content = result.content
+            else:
+                # Use OpenAI client directly
+                resp = client.chat.completions.create(
+                    model=self.judge_model,
+                    messages=[{"role": "user", "content": eval_prompt}],
+                    max_tokens=1000,
+                    temperature=0.0,
+                    response_format={"type": "json_object"}
+                )
+                result_content = resp.choices[0].message.content
+            
+            result_json = json.loads(result_content)
             
             # Extract score
             score_key = f"{metric.name}_score"
