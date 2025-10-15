@@ -742,8 +742,40 @@ print("✅ LLM Judge Evaluator defined with BULLETPROOF JSON parsing")
 
 # COMMAND ----------
 
+def auto_generate_evaluation_prompt(metric_name: str, metric_type: str, description: str, grading_rubric: str) -> str:
+    """
+    Auto-generate evaluation prompt from grading rubric.
+    PM just provides grading rubric, code handles the rest!
+    """
+    
+    # Add grading rubric section
+    rubric_section = f"\n**Grading Rubric:**\n{grading_rubric}\n" if grading_rubric else ""
+    
+    # Build complete evaluation prompt
+    prompt = f"""You are an expert evaluator. Your task: {description}
+
+{rubric_section}
+**Evaluation Details:**
+- User Query: {{prompt}}
+- AI Response: {{response}}
+- Ground Truth Reference: {{ground_truth}}
+
+**Instructions:**
+Carefully evaluate the AI response using the grading rubric above.
+
+**Required Output Format:**
+Return ONLY a valid JSON object with these two fields:
+{{
+  "score": <your_score>,
+  "explanation": "Brief explanation of your score"
+}}
+
+Do not include any other text outside the JSON object."""
+    
+    return prompt
+
 def load_metrics_from_csv():
-    """Load metrics from CSV."""
+    """Load metrics from CSV and auto-generate evaluation prompts."""
     if METRICS_CONFIG_DATA is None:
         return []
     
@@ -759,11 +791,36 @@ def load_metrics_from_csv():
         else:
             metric_type = MetricType.BINARY
         
+        # Check if using new format (grading_rubric) or old format (evaluation_prompt)
+        if 'grading_rubric' in row and pd.notna(row.get('grading_rubric')):
+            # NEW FORMAT: Auto-generate evaluation prompt from grading rubric
+            grading_rubric = str(row['grading_rubric']).strip()
+            prompt_template = auto_generate_evaluation_prompt(
+                metric_name=row['name'].strip(),
+                metric_type=metric_type_str,
+                description=row.get('description', '').strip(),
+                grading_rubric=grading_rubric
+            )
+            print(f"✅ {row['name'].strip()} - Auto-generated prompt from grading rubric")
+        elif 'evaluation_prompt' in row and pd.notna(row.get('evaluation_prompt')):
+            # OLD FORMAT: Use evaluation_prompt directly (backward compatibility)
+            prompt_template = row['evaluation_prompt'].strip()
+            print(f"✅ {row['name'].strip()} - Using provided evaluation_prompt")
+        else:
+            # Fallback: Generate basic prompt from description
+            prompt_template = auto_generate_evaluation_prompt(
+                metric_name=row['name'].strip(),
+                metric_type=metric_type_str,
+                description=row.get('description', '').strip(),
+                grading_rubric=""
+            )
+            print(f"⚠️ {row['name'].strip()} - No rubric or prompt provided, using basic prompt")
+        
         metric_config = MetricConfig(
             name=row['name'].strip(),
             metric_type=metric_type,
-            description=row['description'].strip(),
-            prompt_template=row['evaluation_prompt'].strip(),
+            description=row.get('description', '').strip(),
+            prompt_template=prompt_template,
             threshold=float(row['threshold']),
             ground_truth_column=row['ground_truth_column'].strip(),
             ground_truth_file_path=row['ground_truth_file_path'].strip()
