@@ -685,8 +685,7 @@ class LLMJudgeEvaluator:
             percentages = re.findall(r'(\d+(?:\.\d+)?)[%]?', content)
             if percentages:
                 score = float(percentages[0])
-                if score > 1:
-                    score = score / 100
+                # Keep raw score - _normalize_score will handle range conversion
         
         return score, explanation
     
@@ -702,10 +701,11 @@ class LLMJudgeEvaluator:
         elif metric_type == MetricType.SCALE_1_5:
             return max(1.0, min(5.0, score))
         elif metric_type == MetricType.PERCENTAGE:
-            # Handle both 0-1 and 0-100 scales
-            if score > 1:
-                score = score / 100
-            return max(0.0, min(1.0, score))
+            # Keep percentage in 0-100 range to match thresholds in CSV
+            # If LLM returns 0-1 range, convert to 0-100
+            if score <= 1.0:
+                score = score * 100
+            return max(0.0, min(100.0, score))
         
         return score
     
