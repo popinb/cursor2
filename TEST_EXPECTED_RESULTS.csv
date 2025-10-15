@@ -1,0 +1,62 @@
+sample_id,metric_name,expected_status,expected_score_range,notes
+1,accuracy_check,PASS,1.0,Factually accurate response about Paris
+1,helpfulness_rating,PASS,4-5,Helpful with additional context
+1,safety_check,PASS,1.0,Safe geographical information
+1,completeness_score,PASS,80-100,Complete answer with context
+1,clarity_rating,PASS,4-5,Very clear
+1,tone_check,PASS,1.0,Professional tone
+1,detail_level,PASS,70-90,Good level of detail
+1,relevance_check,PASS,1.0,Directly relevant
+1,engagement_score,PASS,3-5,Engaging description
+1,factual_correctness,PASS,1.0,All facts correct
+1,conciseness_rating,PASS,3-4,Balanced length
+1,error_free,PASS,1.0,No errors
+5,accuracy_check,FAIL,0.0,Says 9 planets - factually wrong
+5,factual_correctness,FAIL,0.0,Pluto no longer a planet
+5,helpfulness_rating,PASS,3-4,Still provides information
+5,safety_check,PASS,1.0,Safe content
+5,completeness_score,UNCERTAIN,40-70,Incorrect but complete in structure
+5,clarity_rating,PASS,3-4,Clear presentation
+5,tone_check,PASS,1.0,Professional
+5,detail_level,PASS,60-80,Adequate detail
+5,relevance_check,PASS,1.0,Answers the question
+5,engagement_score,PASS,3-4,Engaging
+5,conciseness_rating,PASS,3-4,Balanced
+5,error_free,PASS,1.0,No grammar errors
+7,accuracy_check,UNCERTAIN,0-1,Oversimplified but not necessarily wrong
+7,helpfulness_rating,FAIL,1-2,Not helpful - dismissive
+7,safety_check,PASS,1.0,Safe content
+7,completeness_score,FAIL,20-40,Very incomplete
+7,clarity_rating,FAIL,1-2,Unclear and dismissive
+7,tone_check,FAIL,0.0,Unprofessional dismissive tone
+7,detail_level,FAIL,10-30,Superficial
+7,relevance_check,PASS,1.0,Addresses topic
+7,engagement_score,FAIL,1-2,Discouraging
+7,factual_correctness,UNCERTAIN,0-1,Oversimplified
+7,conciseness_rating,FAIL,1-2,Too brief
+7,error_free,PASS,1.0,No grammar errors
+3,completeness_score,UNCERTAIN,50-70,Missing measurements
+3,detail_level,UNCERTAIN,50-70,Moderate detail
+3,accuracy_check,PASS,1.0,Accurate instructions
+6,helpfulness_rating,FAIL,1-2,Too vague
+6,completeness_score,FAIL,30-50,Lacks structure
+6,detail_level,FAIL,20-40,Superficial
+12,conciseness_rating,PASS,4-5,Appropriately concise
+12,accuracy_check,PASS,1.0,Correct translation
+12,completeness_score,PASS,90-100,Complete for translation
+8,helpfulness_rating,PASS,4-5,Very helpful
+8,completeness_score,PASS,85-100,Comprehensive
+8,clarity_rating,PASS,4-5,Very clear
+8,engagement_score,PASS,4-5,Engaging
+10,accuracy_check,PASS,1.0,Accurate steps
+10,completeness_score,PASS,90-100,Complete with safety
+10,detail_level,PASS,85-100,Comprehensive detail
+10,clarity_rating,PASS,4-5,Very clear steps
+17,detail_level,UNCERTAIN,40-60,Brief but accurate
+17,completeness_score,UNCERTAIN,50-70,Could have more detail
+18,completeness_score,UNCERTAIN,50-70,Missing some stages
+18,accuracy_check,PASS,1.0,Accurate but incomplete
+20,accuracy_check,PASS,1.0,Scientifically accurate
+20,completeness_score,PASS,90-100,Comprehensive
+20,detail_level,PASS,85-100,Comprehensive scientific detail
+20,clarity_rating,PASS,4-5,Very clear
