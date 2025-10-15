@@ -178,17 +178,22 @@ ground_truth_data = {}
 
 if GROUND_TRUTH_FILES_LIST:
     print(f"\n📚 Loading {len(GROUND_TRUTH_FILES_LIST)} ground truth files...")
+    print("💡 TIP: In your metrics CSV, just specify the filename (e.g., 'ground_truth_accuracy.csv')")
+    print("        Code will automatically match it to the uploaded files below:\n")
+    
     for file_path in GROUND_TRUTH_FILES_LIST:
         if file_path and os.path.exists(file_path):
             filename = os.path.basename(file_path)
             try:
                 df = pd.read_csv(file_path)
                 ground_truth_data[filename] = df
-                print(f"✅ Loaded {filename}: {len(df)} rows")
+                print(f"✅ {filename} → {len(df)} rows, columns: {', '.join(df.columns.tolist())}")
             except Exception as e:
                 print(f"❌ Error loading {filename}: {e}")
         else:
             print(f"⚠️ File not found: {file_path}")
+    
+    print(f"\n✅ Loaded {len(ground_truth_data)} ground truth files")
 
 # Store data globally
 EVALUATION_DATA = evaluation_data_df
@@ -409,8 +414,18 @@ class LLMJudgeEvaluator:
             return ""
     
     def _get_ground_truth_for_metric(self, metric: MetricConfig, sample_idx: int) -> str:
-        """Get ground truth for a metric from multiple files."""
+        """
+        Get ground truth for a metric from ground truth files.
+        
+        How it works:
+        1. PM specifies just the FILENAME in CSV (e.g., 'ground_truth_accuracy.csv')
+        2. Full paths come from UI widget (e.g., '/Workspace/Users/email/ground_truth_accuracy.csv')
+        3. Code matches filename from CSV to actual uploaded files
+        
+        This means PMs don't need to know full paths - just the filename!
+        """
         try:
+            # PM can specify filename or full path - we handle both
             files = []
             if ';' in metric.ground_truth_file_path:
                 files = [f.strip() for f in metric.ground_truth_file_path.split(';') if f.strip()]
@@ -422,8 +437,9 @@ class LLMJudgeEvaluator:
             if not files or not files[0]:
                 return "Not provided"
             
+            # Match by filename (PM provides filename, widget provides full paths)
             for file_path in files:
-                filename = os.path.basename(file_path)
+                filename = os.path.basename(file_path)  # Extract just the filename
                 if filename in self.ground_truth_data:
                     df = self.ground_truth_data[filename]
                     if metric.ground_truth_column in df.columns:
@@ -816,6 +832,9 @@ def load_metrics_from_csv():
             )
             print(f"⚠️ {row['name'].strip()} - No rubric or prompt provided, using basic prompt")
         
+        # Ground truth file matching (PM provides filename, code matches to uploaded files)
+        gt_file_value = row.get('ground_truth_file_path', '').strip()
+        
         metric_config = MetricConfig(
             name=row['name'].strip(),
             metric_type=metric_type,
@@ -823,8 +842,13 @@ def load_metrics_from_csv():
             prompt_template=prompt_template,
             threshold=float(row['threshold']),
             ground_truth_column=row['ground_truth_column'].strip(),
-            ground_truth_file_path=row['ground_truth_file_path'].strip()
+            ground_truth_file_path=gt_file_value
         )
+        
+        # Show which GT file this metric will use
+        if gt_file_value:
+            gt_filename = os.path.basename(gt_file_value)
+            print(f"   📚 Ground truth: {gt_filename} → column '{row['ground_truth_column'].strip()}'")
         
         metric_configs.append(metric_config)
     
