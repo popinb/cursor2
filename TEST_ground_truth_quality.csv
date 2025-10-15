@@ -1,0 +1,21 @@
+sample_id,clarity_notes,tone_rating,detail_notes,engagement_rating,conciseness_notes,error_check
+1,Very clear and well-written,Professional,Good level of detail with cultural context,Engaging with descriptive language,Balanced - not too verbose,No errors
+2,Clear with effective analogy,Professional and friendly,Good level of detail with helpful comparison,Very engaging with relatable analogy,Concise and efficient,No errors
+3,Clear step-by-step structure,Professional,Moderate detail - missing specific measurements,Moderately engaging,Could be more concise,No errors
+4,Clear and straightforward,Professional,Minimal detail - very brief,Somewhat dry but clear,Very concise,No errors
+5,Clear but contains misinformation,Professional,Moderate detail but factually wrong,Engaging with specific examples,Balanced length,No errors
+6,Somewhat vague and unclear,Casual but acceptable,Superficial - lacks depth,Not very engaging,Too concise - lacks detail,No errors
+7,Unclear and dismissive,Unprofessional tone - dismissive,Superficial explanation,Not engaging - discouraging,Too brief,No errors
+8,Very clear with actionable steps,Professional and encouraging,Comprehensive detail with multiple strategies,Engaging and practical,Well-balanced,No errors
+9,Clear with philosophical nuance,Professional and thoughtful,Good level of detail with examples,Engaging with humor and depth,Well-balanced,No errors
+10,Very clear step-by-step instructions,Professional,Comprehensive with safety considerations,Engaging and practical,Well-balanced,No errors
+11,Clear and informative,Professional,Good level of detail,Moderately engaging,Concise and efficient,No errors
+12,Perfectly clear,Professional,Minimal detail but sufficient,Simple and direct,Very concise - appropriate for task,No errors
+13,Clear list format,Professional,Comprehensive coverage,Moderately engaging,Concise list format,No errors
+14,Clear with historical context,Professional,Good level of detail,Moderately engaging,Well-balanced,No errors
+15,Very clear comparison,Professional,Comprehensive comparison,Engaging and educational,Well-balanced,No errors
+16,Clear structured approach,Professional,Comprehensive overview,Engaging for entrepreneurs,Well-balanced,No errors
+17,Clear but brief,Professional,Minimal detail,Moderately engaging,Very concise,No errors
+18,Clear explanation,Professional,Moderate detail - missing some components,Moderately engaging,Concise,No errors
+19,Clear and supportive,Professional and caring,Comprehensive strategies,Engaging and practical,Well-balanced,No errors
+20,Very clear scientific explanation,Professional,Comprehensive scientific detail,Engaging for science topic,Well-balanced,No errors
